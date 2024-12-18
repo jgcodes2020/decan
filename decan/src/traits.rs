@@ -61,6 +61,27 @@ macro_rules! impl_symbol_fn {
                     })
             }
         }
+
+        impl<R: 'static, $($types: 'static),*>  sealed::Sealed for Option<unsafe extern "C" fn($($types),*) -> R>  {}
+        unsafe impl<R: 'static, $($types: 'static),*> Symbol for Option<unsafe extern "C" fn($($types),*) -> R> {
+            unsafe fn load_from(lib: raw::Handle, name: &CStr) -> Result<Self, SymbolError> {
+                raw::platform::get_symbol(lib, name).map_or_else(
+                    |err| Err(err.into()),
+                    |ptr| Ok(mem::transmute::<_, Self>(ptr)),
+                )
+            }
+        }
+
+        impl<R: 'static, $($types: 'static),*>  sealed::Sealed for unsafe extern "C" fn($($types),*) -> R  {}
+        unsafe impl<R: 'static, $($types: 'static),*> Symbol for unsafe extern "C" fn($($types),*) -> R {
+            unsafe fn load_from(lib: raw::Handle, name: &CStr) -> Result<Self, SymbolError> {
+                raw::platform::get_symbol(lib, name)
+                    .map_err(|err| err.into())
+                    .and_then(|ptr| {
+                        mem::transmute::<_, Option<Self>>(ptr).ok_or(SymbolError::null_value::<Self>())
+                    })
+            }
+        }
     };
 }
 

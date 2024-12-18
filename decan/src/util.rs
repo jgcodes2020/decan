@@ -110,6 +110,9 @@ macro_rules! impl_has_non_null_fn {
         impl<R, $($types),*> HasNonNull for Option<extern "C" fn($($types),*) -> R> {
             type NonNull = extern "C" fn($($types),*) -> R;
         }
+        impl<R, $($types),*> HasNonNull for Option<unsafe extern "C" fn($($types),*) -> R> {
+            type NonNull = unsafe extern "C" fn($($types),*) -> R;
+        }
     };
 }
 
