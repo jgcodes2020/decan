@@ -54,6 +54,9 @@ impl<G: SymbolGroup> Can<ManuallyDrop<Library>, G> {
     }
 }
 
+unsafe impl<H: LibraryHandle, G: SymbolGroup> Send for Can<H, G> {}
+unsafe impl<H: LibraryHandle, G: SymbolGroup> Sync for Can<H, G> {}
+
 impl<H: LibraryHandle, G: SymbolGroup> LibraryHandle for Can<H, G> {
     unsafe fn as_raw(&self) -> crate::raw::Handle {
         self.handle.as_raw()

@@ -116,7 +116,7 @@ unsafe impl<G: SymbolGroup> SymbolGroup for Option<G> {
 
 /// An object that contains a library handle. Library handles can have
 /// symbols borrowed temporarily from them.
-pub trait LibraryHandle {
+pub trait LibraryHandle: Send + Sync {
     /// Obtains the raw library handle.
     /// # Safety
     /// The caller should not free the library while it is in use.
