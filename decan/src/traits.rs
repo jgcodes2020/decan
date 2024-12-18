@@ -68,8 +68,12 @@ util::variadic_0_16!(impl_symbol_fn);
 #[cfg(feature = "variadic_32")]
 util::variadic_17_32!(impl_symbol_fn);
 
-/// A group of known symbols that can be loaded together. It is very unsafe to use this on
-/// its own; you generally want to create a [`Can`][`crate::can::Can`] containing the data.
+/// A group of known symbols that can be loaded together.
+/// 
+/// Using `SymbolGroup`s directly makes it relatively easy for the symbols
+/// to outlive the library handle. In general, symbol groups should either 
+/// be [borrowed][crate::borrow::LibraryBorrowExt::borrow_group] or
+/// [canned][crate::can::Can].
 /// # Safety
 /// All members of a `SymbolGroup` should be [`Symbol`]s, or other [`SymbolGroup`]s.
 /// This ensures that they can be safely loaded, unloaded, and referenced without causing UB.

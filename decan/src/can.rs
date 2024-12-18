@@ -1,7 +1,8 @@
 //! Implementation of *owned symbols* based on [`dlopen`](https://github.com/szymonwieloch/rust-dlopen).
 //! 
 //! Creating a [`Can`] associates a set of symbols with a library handle. The library handle is freed
-//! simultaneously to the symbols.
+//! together with the symbols. I call this trick "canning" since it packages the library and symbols 
+//! together as one unit.
 //! 
 //! While this is memory-safe, it creates a more permanent association between the library and its symbols.
 //! If you only need to load symbols temporarily, you may want to use the [`borrow`][`crate::borrow`] module.
