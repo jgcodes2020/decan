@@ -11,6 +11,11 @@ use std::{mem::ManuallyDrop, ops::Deref, path::Path};
 
 use crate::{raw::{self, Library}, LibraryHandle, LoadOrSymbolGroupError, SymbolGroup, SymbolGroupError};
 
+/// A [`Can`] that owns its library handle.
+pub type OwningCan<G> = Can<Library, G>;
+/// A [`Can`] that does not own its library handle.
+pub type NonOwningCan<G> = Can<ManuallyDrop<Library>, G>;
+
 /// A library together with a set of symbols. The symbols do not outlive the library
 /// because they die with it.
 pub struct Can<H: LibraryHandle, G: SymbolGroup> {
