@@ -1,6 +1,6 @@
 use std::{ffi::CStr, mem, ptr::NonNull};
 
-use crate::{raw, SymbolError, SymbolGroupError};
+use crate::{raw, util::{self, variadic_0_16, variadic_17_32}, SymbolError, SymbolGroupError};
 
 mod sealed {
     pub trait Sealed {}
@@ -64,93 +64,16 @@ macro_rules! impl_symbol_fn {
     };
 }
 
-impl_symbol_fn!();
-impl_symbol_fn!(T1);
-impl_symbol_fn!(T1, T2);
-impl_symbol_fn!(T1, T2, T3);
-impl_symbol_fn!(T1, T2, T3, T4);
-impl_symbol_fn!(T1, T2, T3, T4, T5);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15);
-impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16);
-
+variadic_0_16!(impl_symbol_fn);
 #[cfg(feature = "variadic_32")]
-mod impl_loadable_fn_32 {
-    use super::*;
-    impl_symbol_fn!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17);
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24, T25
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24, T25, T26
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24, T25, T26, T27
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24, T25, T26, T27, T28
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24, T25, T26, T27, T28, T29
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
-    );
-    impl_symbol_fn!(
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
-        T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
-    );
-}
+variadic_17_32!(impl_symbol_fn);
 
 /// A group of known symbols that can be loaded together. It is very unsafe to use this on
 /// its own; you generally want to create a [`Can`][`crate::can::Can`] containing the data.
 /// # Safety
 /// All members of a `SymbolGroup` should be [`Symbol`]s, or other [`SymbolGroup`]s.
 /// This ensures that they can be safely loaded, unloaded, and referenced without causing UB.
-pub unsafe trait SymbolGroup: Sized + Default + 'static {
+pub unsafe trait SymbolGroup: Sized + 'static {
     /// Loads the symbol group from the provided library handle.
     /// # Safety
     /// This function expects the type signatures provided by this `SymbolGroup` to

@@ -6,12 +6,23 @@ version = 3
 name = "decan"
 version = "0.1.0"
 dependencies = [
+ "decan-macros",
+ "decan-testlib",
  "libc",
  "thiserror",
 ]
 
 [[package]]
 name = "decan-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "decan-testlib"
 version = "0.1.0"
 
 [[package]]

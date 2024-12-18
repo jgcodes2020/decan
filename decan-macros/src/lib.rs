@@ -1,14 +1,13 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use proc_macro::TokenStream;
+use syn::parse_macro_input;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod derive_symbol_group;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+#[proc_macro_derive(SymbolGroup, attributes(symbol, subgroup))]
+pub fn derive_symbol_group(item: TokenStream) -> TokenStream {
+    let item = parse_macro_input!(item as syn::DeriveInput);
+
+    derive_symbol_group::generate(item)
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
 }
