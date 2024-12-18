@@ -1,4 +1,4 @@
 [workspace]
 resolver = "2"
-members = ["decan", "decan-macros"]
-default-members = []
+members = ["decan", "decan-macros", "decan-testlib"]
+default-members = ["decan"]

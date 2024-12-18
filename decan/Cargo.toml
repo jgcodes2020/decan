@@ -10,9 +10,6 @@ decan-macros = { path = "../decan-macros" }
 [target."cfg(unix)".dependencies]
 libc = "0.2.168"
 
-[dev-dependencies]
-decan-testlib = { path = "../decan-testlib" }
-
 [features]
 variadic_32 = []
 

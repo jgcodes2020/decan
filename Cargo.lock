@@ -7,7 +7,6 @@ name = "decan"
 version = "0.1.0"
 dependencies = [
  "decan-macros",
- "decan-testlib",
  "libc",
  "thiserror",
 ]

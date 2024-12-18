@@ -1,6 +1,6 @@
 use std::{ffi::CStr, mem, ptr::NonNull};
 
-use crate::{raw, util::{self, variadic_0_16, variadic_17_32}, SymbolError, SymbolGroupError};
+use crate::{raw, util, SymbolError, SymbolGroupError};
 
 mod sealed {
     pub trait Sealed {}
@@ -64,9 +64,9 @@ macro_rules! impl_symbol_fn {
     };
 }
 
-variadic_0_16!(impl_symbol_fn);
+util::variadic_0_16!(impl_symbol_fn);
 #[cfg(feature = "variadic_32")]
-variadic_17_32!(impl_symbol_fn);
+util::variadic_17_32!(impl_symbol_fn);
 
 /// A group of known symbols that can be loaded together. It is very unsafe to use this on
 /// its own; you generally want to create a [`Can`][`crate::can::Can`] containing the data.
