@@ -1,5 +1,25 @@
 use std::{any, ffi::NulError, io};
 
+/// Equivalent of [`std::ffi::NulError`] for wide strings.
+#[derive(Debug, thiserror::Error)]
+#[error("nul word found in provided data at position: {0}")]
+pub struct WideNulError(pub(crate) usize, pub(crate) Vec<u16>);
+
+impl WideNulError {
+    /// Returns the position of the nul word that caused the error.
+    pub fn nul_position(&self) -> usize {
+        self.0
+    }
+
+    /// Consumes this error, returning the underlying vector of words which
+    /// generated the error in the first place.
+    pub fn into_words(self) -> Vec<u16> {
+        self.1
+    }
+}
+
+
+
 /// An error that occurs when loading a dynamic library.
 #[derive(Debug, thiserror::Error)]
 pub enum LoadError {
@@ -10,6 +30,10 @@ pub enum LoadError {
     /// if the provided path contains null characters, which are invalid on most systems.
     #[error("Failed to create C string from path ({0})")]
     CStr(#[source] NulError),
+    /// An error occurred converting the path to a wide C string. This only occurs
+    /// if the provided path contains null characters, which are invalid on most systems.
+    #[error("Failed to create C wide string from path ({0})")]
+    CWStr(#[source] WideNulError)
 }
 
 impl From<io::Error> for LoadError {
@@ -21,6 +45,12 @@ impl From<io::Error> for LoadError {
 impl From<NulError> for LoadError {
     fn from(value: NulError) -> Self {
         Self::CStr(value)
+    }
+}
+
+impl From<WideNulError> for LoadError {
+    fn from(value: WideNulError) -> Self {
+        Self::CWStr(value)
     }
 }
 
