@@ -121,6 +121,6 @@ variadic_17_32!(impl_has_non_null_fn);
 #[macro_export]
 macro_rules! non_null {
     ($type:ty) => {
-        <$type as HasNonNull>::NonNull
+        <$type as ::decan::util::HasNonNull>::NonNull
     };
 }
