@@ -12,9 +12,7 @@ pub(crate) fn generate(input: syn::DeriveInput) -> syn::Result<TokenStream> {
             "derive(SymbolGroup) cannot be used with generics",
         ));
     }
-
     
-
     let (ident, fields) = match &input.data {
         syn::Data::Struct(syn::DataStruct {
             fields: syn::Fields::Named(fields),

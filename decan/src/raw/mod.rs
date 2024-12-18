@@ -1,3 +1,5 @@
+//! Functions for working directly with raw library handles.
+
 #[cfg(unix)]
 pub mod unix;
 #[cfg(windows)]
@@ -5,22 +7,28 @@ pub mod windows;
 
 use std::{mem::ManuallyDrop, path::Path};
 
+/// Alias to the current platform module.
 #[cfg(unix)]
-use unix as platform;
+pub use unix as platform;
+/// Alias to the current platform module.
 #[cfg(windows)]
-use windows as platform;
-
-pub use platform::{Handle, load_library, get_symbol, free_library};
+pub use windows as platform;
 
 use crate::{LibraryHandle, LoadError};
 
-/// An owning handle to an open library.
+/// The platform library handle. This maps to `void*` on Unix-likes and `HMODULE` on Windows.
+pub type Handle = platform::Handle;
+
+
+/// An handle to an open library which frees it when dropped.
+/// 
+/// To prevent the handle from being dropped, use [`ManuallyDrop`].
 pub struct Library(Handle);
 
 impl Library {
     /// Loads a library from a path.
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Self, LoadError> {
-        Ok(Self(unsafe { load_library(path.as_ref().canonicalize()?.as_os_str())? }))
+        Ok(Self(unsafe { platform::load_library(path.as_ref().canonicalize()?.as_os_str())? }))
     }
 
     /// Wraps a raw library handle in a non-owning reference.
@@ -34,7 +42,7 @@ impl Library {
 
 impl Drop for Library {
     fn drop(&mut self) {
-        free_library(self.0);
+        platform::free_library(self.0);
     }
 }
 

@@ -1,3 +1,5 @@
+//! Convenience utilities for writing FFI bindings.
+
 use std::ptr::NonNull;
 
 macro_rules! variadic_0_16 {
@@ -22,7 +24,7 @@ macro_rules! variadic_0_16 {
     };
 }
 
-#[cfg_attr(not(feature = "variadic_32"), allow(unused_macros))]
+#[allow(unused_macros)]
 macro_rules! variadic_17_32 {
     ($macro:path) => {
         use super::*;
@@ -87,9 +89,13 @@ macro_rules! variadic_17_32 {
     };
 }
 
+#[allow(unused_imports)]
 pub(crate) use {variadic_0_16, variadic_17_32};
 
 /// Utility trait for obtaining a non-nullable version of an FFI type.
+/// 
+/// This is intended to be used in conjunction with [`bindgen`](https://github.com/rust-lang/rust-bindgen),
+/// as `bindgen` generates optional types by default.
 pub trait HasNonNull {
     /// The corresponding non-nullable type.
     type NonNull;

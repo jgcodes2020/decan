@@ -15,6 +15,7 @@ dependencies = [
 name = "decan-macros"
 version = "0.1.0"
 dependencies = [
+ "decan",
  "proc-macro2",
  "quote",
  "syn",

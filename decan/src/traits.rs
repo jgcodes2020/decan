@@ -19,21 +19,21 @@ pub unsafe trait Symbol: sealed::Sealed + Sized + 'static {
 impl<T: Sized + 'static> sealed::Sealed for *const T {}
 unsafe impl<T: Sized + 'static> Symbol for *const T {
     unsafe fn load_from(lib: raw::Handle, name: &CStr) -> Result<Self, SymbolError> {
-        raw::get_symbol(lib, name).map_or_else(|err| Err(Into::into(err)), |ptr| Ok(ptr as Self))
+        raw::platform::get_symbol(lib, name).map_or_else(|err| Err(Into::into(err)), |ptr| Ok(ptr as Self))
     }
 }
 
 impl<T: Sized + 'static> sealed::Sealed for *mut T {}
 unsafe impl<T: Sized + 'static> Symbol for *mut T {
     unsafe fn load_from(lib: raw::Handle, name: &CStr) -> Result<Self, SymbolError> {
-        raw::get_symbol(lib, name).map_or_else(|err| Err(Into::into(err)), |ptr| Ok(ptr as Self))
+        raw::platform::get_symbol(lib, name).map_or_else(|err| Err(Into::into(err)), |ptr| Ok(ptr as Self))
     }
 }
 
 impl<T: Sized + 'static> sealed::Sealed for NonNull<T> {}
 unsafe impl<T: Sized + 'static> Symbol for NonNull<T> {
     unsafe fn load_from(lib: raw::Handle, name: &CStr) -> Result<Self, SymbolError> {
-        raw::get_symbol(lib, name)
+        raw::platform::get_symbol(lib, name)
             .map_err(Into::into)
             .and_then(|ptr| NonNull::new(ptr as *mut T).ok_or(SymbolError::null_value::<Self>()))
     }
@@ -44,7 +44,7 @@ macro_rules! impl_symbol_fn {
         impl<R: 'static, $($types: 'static),*>  sealed::Sealed for Option<extern "C" fn($($types),*) -> R>  {}
         unsafe impl<R: 'static, $($types: 'static),*> Symbol for Option<extern "C" fn($($types),*) -> R> {
             unsafe fn load_from(lib: raw::Handle, name: &CStr) -> Result<Self, SymbolError> {
-                raw::get_symbol(lib, name).map_or_else(
+                raw::platform::get_symbol(lib, name).map_or_else(
                     |err| Err(err.into()),
                     |ptr| Ok(mem::transmute::<_, Self>(ptr)),
                 )
@@ -54,7 +54,7 @@ macro_rules! impl_symbol_fn {
         impl<R: 'static, $($types: 'static),*>  sealed::Sealed for extern "C" fn($($types),*) -> R  {}
         unsafe impl<R: 'static, $($types: 'static),*> Symbol for extern "C" fn($($types),*) -> R {
             unsafe fn load_from(lib: raw::Handle, name: &CStr) -> Result<Self, SymbolError> {
-                raw::get_symbol(lib, name)
+                raw::platform::get_symbol(lib, name)
                     .map_err(|err| err.into())
                     .and_then(|ptr| {
                         mem::transmute::<_, Option<Self>>(ptr).ok_or(SymbolError::null_value::<Self>())

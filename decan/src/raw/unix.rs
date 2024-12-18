@@ -1,3 +1,7 @@
+//! Unix implementation of dynamic library loading.
+//! 
+//! This uses the POSIX `dlopen()`/`dlsym()`/`dlclose()` APIs.
+
 use std::{
     ffi::{c_int, c_void, CStr, CString, OsStr}, io, os::unix::ffi::OsStrExt, sync::Mutex
 };
@@ -6,6 +10,7 @@ use libc::{dlclose, dlerror, dlsym, RTLD_GLOBAL, RTLD_LAZY};
 
 use crate::LoadError;
 
+/// The Unix dynamic library handle, `*mut c_void`.
 pub type Handle = *mut c_void;
 
 #[cfg(not(any(target_os = "linux", target_os = "macos")))]
@@ -29,7 +34,9 @@ where
 
 const DEFAULT_FLAGS: c_int = RTLD_GLOBAL | RTLD_LAZY;
 
-/// Loads a library from a path. This is equivalent to:
+/// Loads a library from a path. 
+/// 
+/// This is equivalent to:
 /// ```c
 /// #include <dlfcn.h>
 /// dlopen(path, RTLD_GLOBAL | RTLD_LAZY);
@@ -52,7 +59,9 @@ pub unsafe fn load_library(path: &OsStr) -> Result<*mut c_void, LoadError> {
     })
 }
 
-/// Gets a symbol from a path. This is equivalent to:
+/// Gets a symbol from a path. 
+/// 
+/// This is equivalent to:
 /// ```c
 /// #include <dlfcn.h>
 /// dlsym(handle, symbol);
@@ -77,7 +86,9 @@ pub unsafe fn get_symbol(handle: Handle, symbol: &CStr) -> io::Result<*mut c_voi
     })
 }
 
-/// Closes a library. This is equivalent to:
+/// Closes a library. 
+/// 
+/// This is equivalent to:
 /// ```c
 /// #include <dlfcn.h>
 /// dlclose(handle);

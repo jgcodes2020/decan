@@ -1,9 +1,13 @@
-use std::{any, ffi::{CString, NulError}, io};
+use std::{any, ffi::NulError, io};
 
+/// An error that occurs when loading a dynamic library.
 #[derive(Debug, thiserror::Error)]
 pub enum LoadError {
+    /// An error occurred in the operating system API while loading the library.
     #[error("OS error ({0})")]
     Os(#[source] io::Error),
+    /// An error occurred converting the path to a C string. This only occurs
+    /// if the provided path contains null characters, which are invalid on most systems.
     #[error("Failed to create C string from path ({0})")]
     CStr(#[source] NulError),
 }
@@ -36,6 +40,7 @@ impl SymbolError {
         Self::NullValue(any::type_name::<T>())
     }
 
+    /// Combines this symbol error 
     pub fn in_group<S: Into<Box<str>>>(self, name: S) -> SymbolGroupError {
         SymbolGroupError {
             name: name.into(),
@@ -70,10 +75,16 @@ impl SymbolGroupError {
     }
 }
 
+/// Either a [`LoadError`] or a [`SymbolGroupError`]. 
+/// 
+/// For now, this only occurs when calling [`can::Can::load`][crate::can::Can::load], 
+/// as this is the only call that both loads the library and symbols.
 #[derive(Debug, thiserror::Error)]
 pub enum LoadOrSymbolGroupError {
-    #[error("Library load failed: {0}")]
+    /// An OS error occurred when loading the library.
+    #[error("Library loading failed: {0}")]
     Library(#[source] LoadError),
+    /// One of the symbols in the symbol group failed to load.
     #[error("Symbol loading failed: {0}")]
     Symbol(#[source] SymbolGroupError),
 }

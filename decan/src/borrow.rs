@@ -1,3 +1,11 @@
+//! Implementation of *borrowed symbols* based on [`libloading`](https://github.com/nagisa/rust_libloading).
+//! 
+//! Calling [`LibraryBorrowExt::borrow_symbol`] or [`LibraryBorrowExt::borrow_group`] creates a reference object
+//! whose lifetime cannot exceed the library it was borrowed from.
+//! 
+//! While this is memory-safe, it prevents the library handle from being moved while there are symbols referencing it.
+//! If you need to store a library and symbols in a structure, consider using a [`Can`][crate::can::Can] instead.
+
 use std::{ffi::CStr, marker::PhantomData, ops::Deref};
 
 use crate::{LibraryHandle, Symbol, SymbolError, SymbolGroup, SymbolGroupError};
@@ -8,6 +16,9 @@ pub trait LibraryBorrowExt: LibraryHandle {
     /// # Safety
     /// The caller is responsible for ensuring that the type `T`
     /// matches the exported library symbol for `name`.
+    /// 
+    /// The caller must also take care to avoid aliasing a single memory location
+    /// through multiple mutable references, as this is considered UB in Rust.
     unsafe fn borrow_symbol<'a, T: Symbol>(
         &'a self,
         name: &CStr,
@@ -23,6 +34,9 @@ pub trait LibraryBorrowExt: LibraryHandle {
     /// # Safety
     /// The caller is responsible for ensuring that the type `T`
     /// matches the exported library symbol for `name`.
+    /// 
+    /// The caller must also take care to avoid aliasing a single memory location
+    /// through multiple mutable references, as this is considered UB in Rust.
     unsafe fn borrow_group<'a, T: SymbolGroup>(
         &'a self,
     ) -> Result<SymbolGroupRef<'a, T>, SymbolGroupError> {
