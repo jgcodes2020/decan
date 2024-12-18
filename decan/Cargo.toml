@@ -10,6 +10,13 @@ decan-macros = { path = "../decan-macros" }
 [target."cfg(unix)".dependencies]
 libc = "0.2.168"
 
+[target."cfg(windows)".dependencies.windows]
+version = "0.52"
+features = [
+    "Win32_Foundation",
+    "Win32_System_LibraryLoader"
+]
+
 [features]
 variadic_32 = []
 
