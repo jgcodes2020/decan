@@ -1,13 +1,33 @@
-use std::{any, ffi::CString, io};
+use std::{any, ffi::{CString, NulError}, io};
 
-/// Error that occurs when loading a [`Loadable`].
+#[derive(Debug, thiserror::Error)]
+pub enum LoadError {
+    #[error("OS error ({0})")]
+    Os(#[source] io::Error),
+    #[error("Failed to create C string from path ({0})")]
+    CStr(#[source] NulError),
+}
+
+impl From<io::Error> for LoadError {
+    fn from(value: io::Error) -> Self {
+        Self::Os(value)
+    }
+}
+
+impl From<NulError> for LoadError {
+    fn from(value: NulError) -> Self {
+        Self::CStr(value)
+    }
+}
+
+/// Error that occurs when loading a [`Symbol`][crate::Symbol].
 #[derive(Debug, thiserror::Error)]
 pub enum SymbolError {
     /// An error occurred in the OS's dynamic library loader.
     #[error("OS error ({0})")]
     Os(#[source] io::Error),
     /// A type expects a non-null value, but got a null value.
-    #[error("Symbols of type {0} cannot contain a null value")]
+    #[error("Type {0} expects a non-null value")]
     NullValue(&'static str)
 }
 
@@ -30,6 +50,7 @@ impl From<io::Error> for SymbolError {
     }
 }
 
+/// Error that occurs when loading a [`SymbolGroup`][crate::SymbolGroup].
 #[derive(Debug, thiserror::Error)]
 #[error("Error loading `{name}`: {inner}")]
 pub struct SymbolGroupError {
@@ -38,7 +59,32 @@ pub struct SymbolGroupError {
 }
 
 impl SymbolGroupError {
+    /// The name of the symbol that failed to load.
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    /// The error that occurred when loading the symbol.
+    pub fn inner(&self) -> &SymbolError {
+        &self.inner
+    }
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum LoadOrSymbolGroupError {
+    #[error("Library load failed: {0}")]
+    Library(#[source] LoadError),
+    #[error("Symbol loading failed: {0}")]
+    Symbol(#[source] SymbolGroupError),
+}
+
+impl From<LoadError> for LoadOrSymbolGroupError {
+    fn from(value: LoadError) -> Self {
+        Self::Library(value)
+    }
+}
+impl From<SymbolGroupError> for LoadOrSymbolGroupError {
+    fn from(value: SymbolGroupError) -> Self {
+        Self::Symbol(value)
     }
 }

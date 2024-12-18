@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-libc = "0.2.168"
 thiserror = "2.0.7"
 
 [features]
 variadic_32 = []
+
+[target."cfg(unix)".dependencies]
+libc = "0.2.168"
