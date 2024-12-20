@@ -65,3 +65,7 @@ pub fn free_library(handle: Handle) {
 fn to_io_error(err: WinError) -> io::Error {
     io::Error::from_raw_os_error(err.code().0)
 }
+
+pub unsafe fn get_address_info(ptr: *const c_void) -> Option<AddressInfo> {
+    None
+}

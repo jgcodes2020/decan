@@ -5,7 +5,7 @@ pub mod unix;
 #[cfg(windows)]
 pub mod windows;
 
-use std::{mem::ManuallyDrop, path::Path};
+use std::{ffi::{c_void, CString}, mem::ManuallyDrop, path::{Path, PathBuf}, ptr::NonNull};
 
 /// Alias to the current platform module.
 #[cfg(unix)]
@@ -18,6 +18,15 @@ use crate::{LibraryHandle, LoadError};
 
 /// The platform library handle. This maps to `void*` on Unix-likes and `HMODULE` on Windows.
 pub type Handle = platform::Handle;
+
+/// A struct containing info about a pointer address.
+pub struct AddressInfo {
+    pub lib_path: PathBuf,
+    pub lib_addr: NonNull<c_void>,
+
+    pub sym_name: Option<CString>,
+    pub sym_addr: Option<NonNull<c_void>>,
+}
 
 
 /// An handle to an open library which frees it when dropped.
