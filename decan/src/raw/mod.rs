@@ -69,3 +69,9 @@ impl LibraryHandle for ManuallyDrop<Library> {
         self.0
     }
 }
+
+/// Obtains dynamic-linker information from a memory address.
+#[inline(always)]
+pub unsafe fn get_address_info(ptr: *const c_void) -> Option<AddressInfo> {
+    platform::get_address_info(ptr)
+}
